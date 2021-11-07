@@ -1,4 +1,4 @@
 # ecommerce-DJANGO
 Learning Django.
 
-![Screenshot](main-page.png)
+![Screenshot](main-page.PNG)
