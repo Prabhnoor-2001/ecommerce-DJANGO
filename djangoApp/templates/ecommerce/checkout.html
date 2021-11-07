@@ -1,0 +1,162 @@
+{% extends 'ecommerce/main.html' %} {% load static %} {% block content %}
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="box-element" id="form-wrapper">
+      <form id="form">
+        <div id="user-info">
+          <div class="form-field">
+            <input
+              type="text"
+              required
+              name="name"
+              placeholder="Name..."
+              class="form-control"
+            />
+          </div>
+          <br />
+          <div class="form-field">
+            <input
+              type="email"
+              required
+              name="Email"
+              placeholder="Email..."
+              class="form-control"
+            />
+          </div>
+          <div id="shipping-info">
+            <hr />
+            <p>Shipping Information:</p>
+            <hr />
+            <div class="form-field">
+              <input
+                class="form-control"
+                type="text"
+                name="address"
+                placeholder="Address.."
+              />
+            </div>
+            <br />
+            <div class="form-field">
+              <input
+                class="form-control"
+                type="text"
+                name="city"
+                placeholder="City.."
+              />
+            </div>
+            <br />
+            <div class="form-field">
+              <input
+                class="form-control"
+                type="text"
+                name="state"
+                placeholder="State.."
+              />
+            </div>
+            <br />
+            <div class="form-field">
+              <input
+                class="form-control"
+                type="text"
+                name="zipcode"
+                placeholder="Zip code.."
+              />
+            </div>
+          </div>
+          <hr />
+        </div>
+
+        <div id="shipping-info"></div>
+
+        <input
+          type="submit"
+          id="form-button"
+          class="btn btn-success btn-block"
+          value="Make Payment"
+        />
+      </form>
+    </div>
+    <!-- <div class="box-element hidden" id="payment-info">
+      PayPal
+      <hr />
+      <button id="make-payment">Make Payment</button>
+    </div> -->
+    <br />
+  </div>
+  <div class="col-lg-6">
+    <div class="box-element">
+      <a href="{% url 'cart' %}" class="btn btn-outline-dark"
+        >&#8592; Back to Cart</a
+      >
+      <hr />
+      <h3>Order Summary</h3>
+      {% for item in items %}
+      <div class="cart-row">
+        <div style="flex: 2">Image</div>
+        <div style="flex: 2">{{item.product}}</div>
+        <div style="flex: 1">${{item.price}}</div>
+        <div style="flex: 1">{{item.quantity}}</div>
+        <div style="flex: 1">${{item.getTotal}}</div>
+      </div>
+      {% endfor %}
+      <h5>Items: {{order.getCartItems}}</h5>
+      <h5>Total: {{order.getCartTotal}}</h5>
+    </div>
+    <br />
+  </div>
+</div>
+
+<script type="text/javascript">
+  var shipping = "{{order.shipping}}";
+  var total = "{{order.getCartTotal }}";
+  var form = document.getElementById("form");
+  if (shipping == "False") {
+    document.getElementById("shipping-info").innerHTML = "";
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    submitData();
+  });
+
+  function submitData() {
+    console.log("clickyyy");
+    var userForm = {
+      name: form.name.value,
+      email: form.Email.value,
+      total: total,
+    };
+    var shippingInfo = {
+      address: null,
+      city: null,
+      state: null,
+      zipcode: null,
+    };
+
+    if (shipping != "False") {
+      shippingInfo.address = form.address.value;
+      shippingInfo.city = form.city.value;
+      shippingInfo.state = form.state.value;
+      shippingInfo.zipcode = form.zipcode.value;
+    }
+    var url = "/processOrder/";
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ userForm, shippingInfo }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        alert("completed transaction");
+        window.location.href = '{% url "ecommerce" %}';
+      });
+  }
+</script>
+
+{% endblock content %}
